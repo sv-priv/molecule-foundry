@@ -9,9 +9,10 @@ interface IMolecule {
     function addToBrightlist(address minter) external;
 
     //only owner
+    // revoking brightlist
     function revokeFromBrightlist(address minter) external;
 
     //minting
 
-    function mintToken(address tokenUri) external payable;
+    function mintToken(string calldata tokenUri) external;
 }

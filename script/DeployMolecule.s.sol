@@ -11,11 +11,8 @@ contract DeployMolecule is Script {
         vm.startBroadcast();
 
         address owner = 0x559441FEf78b7E27b66db69C11e5B3827e1aea96;
+        molecule = new Molecule(owner);
 
-        string memory name = "Molecule";
-        string memory symbol = "MLCL";
-
-        molecule = new Molecule(name, symbol, owner);
         vm.stopBroadcast();
     }
 }

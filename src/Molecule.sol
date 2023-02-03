@@ -2,21 +2,13 @@
 
 pragma solidity 0.8.15;
 
-// #     # ####### #       #######  #####  #     # #       #######
-// ##   ## #     # #       #       #     # #     # #       #
-// # # # # #     # #       #       #       #     # #       #
-// #  #  # #     # #       #####   #       #     # #       #####
-// #     # #     # #       #       #       #     # #       #
-// #     # #     # #       #       #     # #     # #       #
-// #     # ####### ####### #######  #####   #####  ####### #######
-
 import "solmate/tokens/ERC721.sol";
 import "./interfaces/IMolecule.sol";
 
 contract Molecule is ERC721, IMolecule {
-    address[] public minters;
-
     mapping(address => bool) brightlistedAddresses;
+    // Optional mapping for token URIs
+    mapping(uint256 => string) private _tokenURIs;
 
     address public owner;
 
@@ -27,11 +19,20 @@ contract Molecule is ERC721, IMolecule {
         _;
     }
 
-    constructor() public ERC721("Molecule", "MLCL") {}
+    constructor(address _owner) ERC721("Molecule", "MLCL") {
+        owner = _owner;
+    }
 
-    function tokenURI(
-        uint256 id
-    ) public view virtual override returns (string memory) {}
+    function _setTokenURI(
+        uint256 tokenId,
+        string memory _tokenURI
+    ) internal virtual {
+        _tokenURIs[tokenId] = _tokenURI;
+    }
+
+    function tokenURI(uint256 id) public view override returns (string memory) {
+        return _tokenURIs[id];
+    }
 
     /**
      * @notice Add to brightlist
@@ -47,15 +48,13 @@ contract Molecule is ERC721, IMolecule {
         brightlistedAddresses[_addressToRevoke] = false;
     }
 
-    function mintToken(string tokenUri) external payable override {
+    function mintToken(string calldata _tokenURI) external {
         require(brightlistedAddresses[msg.sender]);
 
-        _mint(msg.sender, tokenUri);
-        _setTokenURI(counter, tokenURI);
+        _mint(msg.sender, counter);
+        _setTokenURI(counter, _tokenURI);
 
         counter += 1;
         brightlistedAddresses[msg.sender] = false;
-
-        return counter;
     }
 }
